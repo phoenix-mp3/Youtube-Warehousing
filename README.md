@@ -1,51 +1,138 @@
-# Youtube-Warehousing
-YouTube Data Harvesting and Warehousing using Postgresql, MongoDB and Streamlit
+# YouTube Data Harvesting and Warehousing by Hemanth Karthick
 
+Welcome to the **YouTube Data Harvesting and Warehousing** project! This application enables users to access, analyze, and store data from various YouTube channels, leveraging powerful technologies like PostgreSQL, MongoDB, and Streamlit.
 
-The YouTube Data Harvesting and Warehousing project is designed to empower users to access and analyze data from various YouTube channels. The application utilizes SQL, MongoDB, and Streamlit to create a user-friendly interface for retrieving, saving, and querying YouTube channel and video data.
+## 🚀 Project Overview
 
-Tools and Libraries Used:
+The application provides a seamless interface for retrieving, saving, and querying YouTube channel and video data. Built with Python and a suite of robust tools, it supports the following features:
 
-Streamlit: 
-This library is employed to develop a user-friendly UI that facilitates interaction with the program, allowing users to perform data retrieval and analysis operations.
+- **Data Retrieval:** Fetch channel and video information using the YouTube Data API v3.
+- **Data Storage:** Store raw data in MongoDB, acting as a data lake.
+- **Data Migration:** Migrate data from MongoDB to PostgreSQL for structured querying and analysis.
+- **Data Querying:** Search and retrieve data from the SQL database with various options.
 
-Python: 
-The primary programming language used for the entire application, Python is known for its simplicity and power. It is employed for tasks such as data retrieval, processing, analysis, and visualization.
+## 🔧 Tools and Libraries
 
-Google API Client:
-The googleapiclient library in Python is crucial for communicating with various Google APIs. In this project, it interacts with YouTube's Data API v3, enabling the retrieval of essential information like channel details, video specifics, and comments.
+- **Streamlit:** Build interactive and user-friendly UIs for data interaction.
+- **Python:** Core programming language for data retrieval, processing, and visualization.
+- **Google API Client:** Interface with YouTube's Data API v3 to fetch data.
+- **MongoDB:** Document database for storing unstructured or semi-structured data.
+- **PostgreSQL:** Relational database for managing structured data with advanced SQL features.
 
-MongoDB: 
-This document database is chosen for its scale-out architecture, making it suitable for developing scalable applications with evolving data schemas. MongoDB simplifies the storage of structured or unstructured data using a JSON-like format.
+## 📦 Required Libraries
 
-PostgreSQL: 
-An open-source and highly scalable database management system, PostgreSQL is known for its reliability and extensive features. It provides a platform for storing and managing structured data, supporting various data types and advanced SQL capabilities.
+Ensure you have the following Python libraries installed:
 
-Ethical Perspective on YouTube Data Scraping:
-Ethical considerations are paramount when engaging in YouTube content scraping. Adhering to YouTube's terms and conditions, obtaining proper authorization, and following data protection regulations are essential. Responsible handling of collected data, ensuring privacy and confidentiality, and preventing misuse are critical aspects. Consideration for the potential impact on the platform and its community is crucial, aiming for a fair and sustainable scraping process to uphold integrity.
+```bash
+pip install google-api-python-client
+pip install streamlit
+pip install psycopg2
+pip install pymongo
+pip install pandas
+```
 
-Required Libraries:
+## 🔍 Features
 
-googleapiclient.discovery
+### Data Retrieval
 
-streamlit
+Fetch channel and video data from YouTube using the API:
 
-psycopg2
+```python
+from googleapiclient.discovery import build
 
-pymongo
+# Set up YouTube API client
+youtube = build('youtube', 'v3', developerKey='YOUR_API_KEY')
 
-pandas
+# Example function to get channel details
+def get_channel_details(channel_id):
+    request = youtube.channels().list(
+        part='snippet,contentDetails,statistics',
+        id=channel_id
+    )
+    response = request.execute()
+    return response
+```
 
-Features:
+### Data Storage
 
-The YouTube Data Harvesting and Warehousing application offers the following functions:
+Store data in MongoDB:
 
-Retrieval of channel and video data from YouTube using the YouTube API.
+```python
+from pymongo import MongoClient
 
-Storage of data in a MongoDB database as a data lake.
+# Connect to MongoDB
+client = MongoClient('mongodb://localhost:27017/')
+db = client['youtube_data']
 
-Migration of data from the data lake to a SQL database for efficient querying and analysis.
+# Example function to insert data
+def store_channel_data(channel_data):
+    db.channels.insert_one(channel_data)
+```
 
-Search and retrieval of data from the SQL database using different search options.
+### Data Migration
 
-For a Python code implementation, consider the following code snippets for each feature. Please note that these are simplified examples, and actual implementation may require additional considerations based on the specific project requirements and architecture.
+Move data from MongoDB to PostgreSQL:
+
+```python
+import psycopg2
+
+# Connect to PostgreSQL
+conn = psycopg2.connect(dbname='youtube_db', user='user', password='password', host='localhost')
+cur = conn.cursor()
+
+# Example function to insert data into PostgreSQL
+def migrate_channel_data():
+    data = db.channels.find()
+    for item in data:
+        cur.execute("INSERT INTO channels (id, name, description) VALUES (%s, %s, %s)",
+                    (item['id'], item['name'], item['description']))
+    conn.commit()
+```
+
+### Data Querying
+
+Query and analyze data with SQL:
+
+```python
+# Example function to query channel data
+def query_channel_data(name):
+    cur.execute("SELECT * FROM channels WHERE name = %s", (name,))
+    results = cur.fetchall()
+    return results
+```
+
+## ⚠️ Ethical Considerations
+
+Respect YouTube’s terms of service and data protection regulations. Ensure responsible data handling and prevent misuse. Prioritize privacy and integrity in your data scraping processes.
+
+## 🌐 Getting Started
+
+1. **Clone the Repository:**
+
+    ```bash
+    git clone https://github.com/yourusername/youtube-data-warehousing.git
+    ```
+
+2. **Install Dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Run the Application:**
+
+    ```bash
+    streamlit run app.py
+    ```
+
+4. **Configure Your API Keys:**
+
+    Update `config.py` with your YouTube API key and database connection details.
+
+## 🛠️ Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
